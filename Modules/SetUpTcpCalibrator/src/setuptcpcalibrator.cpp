@@ -141,6 +141,7 @@ void SetUpTcpCalibrator::calibrateGooseSaw(double MatrixRefToPointAcoordinate[16
   Eigen::Vector3d PQ(sawPlanePointQ[0] - sawPlanePointP[0],
                      sawPlanePointQ[1] - sawPlanePointP[1],
                      sawPlanePointQ[2] - sawPlanePointP[2]);
+
   double normPQ = PQ.norm();
 
   Eigen::Vector3d PS(sawPlanePointS[0] - sawPlanePointP[0],
@@ -151,6 +152,7 @@ void SetUpTcpCalibrator::calibrateGooseSaw(double MatrixRefToPointAcoordinate[16
 
   // 3 unit vectors of the coordinate system at Point A
   Eigen::Matrix4d matrixRefToPointACoordinate{MatrixRefToPointAcoordinate};
+
   matrixRefToPointACoordinate.transposeInPlace();
   Eigen::Vector3d x(matrixRefToPointACoordinate(0), matrixRefToPointACoordinate(1), matrixRefToPointACoordinate(2));
   Eigen::Vector3d y(matrixRefToPointACoordinate(4), matrixRefToPointACoordinate(5), matrixRefToPointACoordinate(6));
@@ -164,6 +166,7 @@ void SetUpTcpCalibrator::calibrateGooseSaw(double MatrixRefToPointAcoordinate[16
 
   // 3 unit vectors of the coordinate system at Point D
   Eigen::Vector3d X;
+
   X = PQ.cross(PS) / (normPQ * normPS);
   if (X.dot(x) < 0)
   {
@@ -172,7 +175,9 @@ void SetUpTcpCalibrator::calibrateGooseSaw(double MatrixRefToPointAcoordinate[16
 
   Eigen::Vector3d Y;
   Y = y - X * (y.dot(X));
+
   Y = Y / Y.norm();
+
 
   Eigen::Vector3d Z;
   Z = X.cross(Y);
@@ -184,6 +189,10 @@ void SetUpTcpCalibrator::calibrateGooseSaw(double MatrixRefToPointAcoordinate[16
 
   // Obtain the rotation angles
   Eigen::Matrix3d matrixR;
+
+
+  Eigen::Vector3d eulerAngles = matrixR.eulerAngles(0, 1, 2); // ZYX rotation
+  
   matrixR = matrixD * inverseMatrixA;
   Eigen::Vector3d eulerAngles = matrixR.eulerAngles(0, 1, 2); // ZYX rotation
 
